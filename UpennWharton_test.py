@@ -3,29 +3,25 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment
 import urllib.request
 import requests
-from selenium import webdriver
-import chromedriver_binary  # Adds chromedriver binary to path
-import re
-
-driver = webdriver.Chrome()
-driver.get('https://seekingalpha.com/article/4448637-amd-intel-nvidia-best-chip-stock')
-htmlSource = driver.page_source
-#print(htmlSource)
-
-soup = BeautifulSoup(htmlSource, 'html.parser')
-[s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
-visible_text = soup.getText()
 
 
-#print(visible_text)
+res = requests.get('https://seekingalpha.com/article/4448637-amd-intel-nvidia-best-chip-stock')
+soup = BeautifulSoup(res.text, 'html.parser')
+#print(soup)
+linkElems = soup.select('p')
+html = []
+for i in range(len(linkElems)):
+    html.append(linkElems[i].getText())
+text = ' '.join(html)
+#print(html)
 
 
 #text = "I love good ham. I love poor and profitable sam."
 
-a_list = nltk.tokenize.sent_tokenize(visible_text)
+a_list = nltk.tokenize.sent_tokenize(text)
 
-#print(a_list)
-#print("___________________")
+print(a_list)
+print("___________________")
 
 #cleanse of periods and that bad stuff
 
@@ -39,7 +35,7 @@ for i in range(len(a_list)):
     a_list[i] = newline
     newline = ""
 
-#print("new alist, ", a_list)
+print("new alist, ", a_list)
 
 goodstuff = ["save", "soar", "increase", "up", "profitable", "southern"]
 
@@ -57,9 +53,3 @@ for i in range(len(a_list)):
         for bad in badstuff: 
             if words[k] == bad:
                 print(a_list[i])
-
-print("_________________________________")
-for i in range(len(a_list)):
-    if len(re.findall(r"(\+*|\-*)(\d+\.*\d*\%)", a_list[i])) != 0:
-        print(a_list[i])
-        
